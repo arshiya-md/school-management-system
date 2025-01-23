@@ -7,8 +7,8 @@
 - `school-admin`: Administrator for a specific school
 
 ### Authentication Flow
-1. User Registration: `/user/register`
-2. User Login: `/user/login`
+1. User Registration: `POST /api/user/register`
+2. User Login: `GET /api/user/login`
    - Returns a long-lived authentication token
 3. All subsequent requests require the token in the Authorization header
 
@@ -17,7 +17,7 @@
 ### User Management
 
 #### Register User
-- **Endpoint**: `POST /user/register`
+- **Endpoint**: `POST /api/user/register`
 - **Required Permissions**: None
 - **Request Body**:
   ```json
@@ -38,7 +38,7 @@
   ```
 
 #### Login User
-- **Endpoint**: `POST /user/login`
+- **Endpoint**: `POST /api/user/login`
 - **Required Permissions**: None
 - **Request Body**:
   ```json
@@ -57,7 +57,7 @@
 ### School Management
 
 #### Create School
-- **Endpoint**: `POST /school`
+- **Endpoint**: `POST /api/school`
 - **Required Permissions**: Super Admin
 - **Request Body**:
   ```json
@@ -76,7 +76,7 @@
   ```
 
 #### Update School
-- **Endpoint**: `PUT /school/{schoolId}`
+- **Endpoint**: `PUT /api/school/{schoolId}`
 - **Required Permissions**: Super Admin
 - **Request Body**:
   ```json
@@ -93,8 +93,8 @@
   }
   ```
 
-#### Get School
-- **Endpoint**: `GET /school/{schoolId}`
+#### GET /apiSchool
+- **Endpoint**: `GET /api/school/{schoolId}`
 - **Required Permissions**: Super Admin
 - **Success Response**:
   ```json
@@ -104,7 +104,7 @@
   ```
 
 #### List Schools
-- **Endpoint**: `GET /schools`
+- **Endpoint**: `GET /api/schools`
 - **Required Permissions**: Super Admin
 - **Success Response**:
   ```json
@@ -116,7 +116,7 @@
 ### Classroom Management
 
 #### Create Classroom
-- **Endpoint**: `POST /school/{schoolId}/classroom`
+- **Endpoint**: `POST /api/school/{schoolId}/classroom`
 - **Required Permissions**: School Admin
 - **Request Body**:
   ```json
@@ -136,7 +136,7 @@
 ### Student Management
 
 #### Create Student
-- **Endpoint**: `POST /school/{schoolId}/classroom/{classroomId}/student`
+- **Endpoint**: `POST /api/school/{schoolId}/classroom/{classroomId}/student`
 - **Required Permissions**: School Admin
 - **Request Body**:
   ```json

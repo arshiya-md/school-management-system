@@ -2,6 +2,11 @@ const http              = require('http');
 const express           = require('express');
 const cors              = require('cors');
 const app               = express();
+// const swaggerUi      = require('swagger-ui-express');
+// const swaggerDocs    = require('./../../swaggerdocs.js');
+const path              = require('path');
+const fs                = require('fs');
+const { marked }        = require('marked');
 
 module.exports = class UserServer {
     constructor({config, managers}){
@@ -26,9 +31,23 @@ module.exports = class UserServer {
             console.error(err.stack)
             res.status(500).send('Something broke!')
         });
+
+        app.get('/', (req, res) => {
+            const filePath = path.join(__dirname, '../../readme.md');
+
+            fs.readFile(filePath, 'utf8', (err, data) => {
+                if (err) {
+                    res.status(500).send('Error reading markdown file');
+                    return;
+                }
+                res.send(marked(data));  // Convert markdown to HTML and send
+            });
+        });
         
         /** a single middleware to handle all */
         app.all('/api/:moduleName/:fnName', this.userApi.mw);
+
+        // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
         let server = http.createServer(app);
         server.listen(this.config.dotEnv.PORT, () => {
