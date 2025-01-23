@@ -33,14 +33,16 @@ module.exports = class UserServer {
         });
 
         app.get('/', (req, res) => {
-            const filePath = path.join(__dirname, '../../readme.md');
-
+            const filePath = path.resolve(__dirname, '../../readme.md');
+            console.log('Resolved File Path:', filePath); // Log the resolved path
+        
             fs.exists(filePath, (exists) => {
                 if (!exists) {
+                    console.log('Markdown file not found at path:', filePath);
                     res.status(500).send('Markdown file not found');
                     return;
                 }
-            
+        
                 fs.readFile(filePath, 'utf8', (err, data) => {
                     if (err) {
                         res.status(500).send('Error reading markdown file');
@@ -49,8 +51,8 @@ module.exports = class UserServer {
                     res.send(marked(data));  // Convert markdown to HTML and send
                 });
             });
-            
         });
+
         
         /** a single middleware to handle all */
         app.all('/api/:moduleName/:fnName', this.userApi.mw);
