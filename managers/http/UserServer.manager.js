@@ -35,13 +35,21 @@ module.exports = class UserServer {
         app.get('/', (req, res) => {
             const filePath = path.join(__dirname, '../../readme.md');
 
-            fs.readFile(filePath, 'utf8', (err, data) => {
-                if (err) {
-                    res.status(500).send('Error reading markdown file');
+            fs.exists(filePath, (exists) => {
+                if (!exists) {
+                    res.status(500).send('Markdown file not found');
                     return;
                 }
-                res.send(marked(data));  // Convert markdown to HTML and send
+            
+                fs.readFile(filePath, 'utf8', (err, data) => {
+                    if (err) {
+                        res.status(500).send('Error reading markdown file');
+                        return;
+                    }
+                    res.send(marked(data));  // Convert markdown to HTML and send
+                });
             });
+            
         });
         
         /** a single middleware to handle all */
