@@ -74,10 +74,10 @@ module.exports = class ManagersLoader {
         this.managers.timeMachine         = new TimeMachine(this.injectable);
         this.managers.token               = new TokenManager(this.injectable);
 
-        this.managers.school = new SchoolManager({validators: this.validators, mongomodels: this.mongomodels});
-        this.managers.classroom = new ClassroomManager({validators: this.validators, mongomodels: this.mongomodels});
-        this.managers.student = new StudentManager({validators: this.validators, mongomodels: this.mongomodels});
-        this.managers.user = new UserManager({validators: this.validators, mongomodels: this.mongomodels});
+        this.managers.school              = new SchoolManager({validators: this.validators, mongomodels: this.mongomodels});
+        this.managers.classroom           = new ClassroomManager({validators: this.validators, mongomodels: this.mongomodels});
+        this.managers.student             = new StudentManager({validators: this.validators, mongomodels: this.mongomodels});
+        this.managers.user                = new UserManager(this.injectable);
         /*************************************************************************************************/
         this.managers.mwsExec             = new VirtualStack({ ...{ preStack: [/* '__token', */'__device',] }, ...this.injectable });
         this.managers.userApi             = new ApiHandler({...this.injectable,...{prop:'httpExposed'}});
