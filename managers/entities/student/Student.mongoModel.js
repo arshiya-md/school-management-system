@@ -7,7 +7,6 @@ const StudentModel = new mongoose.Schema({
     lastName: { type: String, required: true },
     dateOfBirth: { type: Date, required: true },
     email: { type: String, required: true },
-    status: { type: String, default: 'enrolled' },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
     transferDate: { type: Date }

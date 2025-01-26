@@ -2,56 +2,52 @@ const emojis = require('../../public/emojis.data.json');
 
 module.exports = {
     id: {
-        path: "id",
-        type: "string",
+        type: 'String',
         length: { min: 1, max: 50 },
     },
     username: {
-        path: 'username',
-        type: 'string',
+        type: 'String',
         length: {min: 3, max: 20},
-        custom: 'username',
     },
     password: {
         path: 'password',
-        type: 'string',
+        type: 'String',
         length: {min: 8, max: 100},
     },
     email: {
         path: 'email',
-        type: 'string',
+        type: 'String',
         length: {min:3, max: 100},
     },
     title: {
-        path: 'title',
-        type: 'string',
+        type: 'String',
         length: {min: 3, max: 300}
     },
     label: {
         path: 'label',
-        type: 'string',
+        type: 'String',
         length: {min: 3, max: 100}
     },
     shortDesc: {
         path: 'desc',
-        type: 'string',
+        type: 'String',
         length: {min:3, max: 300}
     },
     longDesc: {
         path: 'desc',
-        type: 'string',
+        type: 'String',
         length: {min:3, max: 2000}
     },
     url: {
         path: 'url',
-        type: 'string',
+        type: 'String',
         length: {min: 9, max: 300},
     },
     emoji: {
         path: 'emoji',
         type: 'Array',
         items: {
-            type: 'string',
+            type: 'String',
             length: {min: 1, max: 10},
             oneOf: emojis.value,
         }
@@ -62,7 +58,7 @@ module.exports = {
     },
     avatar: {
         path: 'avatar',
-        type: 'string',
+        type: 'String',
         length: {min: 8, max: 100},
     },
     text: {
@@ -87,7 +83,7 @@ module.exports = {
     },
     number: {
         type: 'Number',
-        length: {min: 1, max:6},
+        length: {min: 1, max:100},
     },
     arrayOfStrings: {
         type: 'Array',
@@ -102,4 +98,9 @@ module.exports = {
     bool: {
         type: 'Boolean',
     },
+    date: {
+        type: 'String',
+        format: /^\d{4}-\d{2}-\d{2}$/,
+    },
+    
 }

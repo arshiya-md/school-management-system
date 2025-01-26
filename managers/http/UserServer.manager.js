@@ -2,6 +2,8 @@ const http              = require('http');
 const express           = require('express');
 const cors              = require('cors');
 const app               = express();
+const swaggerUi         = require('swagger-ui-express');
+const swaggerDocs       = require('../../swagger/swaggerDocs');
 
 module.exports = class UserServer {
     constructor({config, managers}){
@@ -29,6 +31,14 @@ module.exports = class UserServer {
         
         /** a single middleware to handle all */
         app.all('/api/:moduleName/:fnName', this.userApi.mw);
+
+        /** Redirect root to Swagger UI */
+        app.get('/', (req, res) => {
+            res.redirect('/api-docs');
+        });
+
+        /** Serve Swagger UI */
+        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
         let server = http.createServer(app);
         server.listen(this.config.dotEnv.PORT, () => {

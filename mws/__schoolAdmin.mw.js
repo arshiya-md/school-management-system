@@ -6,11 +6,11 @@ module.exports = () => {
 
       if (!role || !schoolId) {
         console.log('Missing user role or school ID in the request');
-        return res.status(400).json({ error: 'Missing required data in the request' });
+        return res.status(400).json({ error: 'Unauthorized access' });
       }
 
-      if (role !== 'school-admin' || schoolId != req.body.schoolId) {
-        console.log(`Unauthorized access attempt. Role: ${role}, SchoolId: ${schoolId}`);
+      if (role !== 'school-admin' || (schoolId != req.body.schoolId && schoolId != req.query.schoolId)) {
+        console.log(`Unauthorized access attempt. Role: ${role}, SchoolId: ${schoolId}`, req.body.schoolId);
         return res.status(403).json({ error: 'Unauthorized access' });
       }
       next();

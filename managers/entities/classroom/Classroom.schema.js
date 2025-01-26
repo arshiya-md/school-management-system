@@ -1,73 +1,53 @@
-module.exports = {
-    createClassroom: {
-        schoolId: {
-            type: 'String',
-            length: { min: 1, max: 24 },
-            required: true
-        },
-        name: {
-            type: 'String',
-            length: { min: 2, max: 50 },
-            required: true
-        },
-        capacity: {
-            type: 'Number',
-            min: 1,
-            required: true
-        },
-        resources: {
-            type: 'Array',
-            required: false,
-            items: {
-                type: 'String'
-            }
-        }
+const classroomSchema = [
+    {
+        path: 'name',
+        model: 'title',
+        required: true
     },
-    updateClassroom: {
-        classroomId: {
-            type: 'String',
-            length: { min: 1, max: 24 },
-            required: true
-        },
-        schoolId: {
-            type: 'String',
-            length: { min: 1, max: 24 },
-            required: true
-        },
-        updates: {
-            type: 'Object',
-            required: true,
-            schema: {
-                name: {
-                    type: 'String',
-                    length: { min: 2, max: 50 },
-                    required: false
-                },
-                capacity: {
-                    type: 'Number',
-                    min: 1,
-                    required: false
-                },
-                resources: {
-                    type: 'Array',
-                    required: false,
-                    items: {
-                        type: 'String'
-                    }
-                }
-            }
-        }
+    {
+        path: 'capacity',
+        model: 'number',
+        required: true
     },
-    deleteClassroom: {
-        classroomId: {
-            type: 'String',
-            length: { min: 1, max: 24 },
-            required: true
-        },
-        schoolId: {
-            type: 'String',
-            length: { min: 1, max: 24 },
-            required: true
-        },
+    {
+        path: 'resources',
+        model: 'arrayOfStrings',
+        required: false
     }
+];
+
+const classroomIdSchema = [
+    {
+        path: 'classroomId',
+        model: 'id',
+        required: true,
+    }
+];
+
+const schoolIdSchema = [    
+    {
+        path: 'schoolId',
+        model: 'id',
+        required: true,
+    }
+];
+
+module.exports = {
+    createClassroom: [
+        ...schoolIdSchema, 
+        ...classroomSchema
+    ],
+    updateClassroom: [
+        ...schoolIdSchema,
+        ...classroomIdSchema,
+        ...classroomSchema,
+    ],
+    getClassroom: [
+        ...schoolIdSchema,
+        ...classroomIdSchema
+    ],
+    deleteClassroom: [
+        ...schoolIdSchema,
+        ...classroomIdSchema
+    ],
 };

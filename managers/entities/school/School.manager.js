@@ -1,11 +1,8 @@
 module.exports = class School {
 
-    constructor({ utils, cache, config, cortex, managers, validators, mongomodels } = {}) {
-        this.config = config;
-        // this.cortex = cortex;
+    constructor({ validators, mongomodels } = {}) {
         this.validators = validators;
-        this.mongomodels = mongomodels;
-        this.SchoolModel = this.mongomodels.School;
+        this.SchoolModel = mongomodels.School;
         this.httpExposed = ['post=createSchool', 'put=updateSchool', 'delete=deleteSchool', 'get=getSchool', 'get=getAllSchools'];
     }
 
@@ -14,24 +11,23 @@ module.exports = class School {
      * @param {Object} params
      * @param {string} params.name - Name of the school
      * @param {string} params.address - Address of the school
-     * @param {string} params.adminId - Admin ID associated with the school
-     * @param {string} params.email - Email ID
+     * @param {string} params.schoolAdminId - SuperAdmin ID associated with the school
+     * @param {string} params.contactEmail - Contact email ID
      * @returns {Promise<Object>} - Created school object
      */
-    async createSchool({ __token, __superAdmin, name, address, adminId, email }) {
-        const school = { name, address, adminId, email };
+    async createSchool({ __token, __superAdmin, name, address, schoolAdminId, contactEmail }) {
+        const school = { name, address, schoolAdminId, contactEmail };
 
-        // Data validation
-        const validationError = await this.validators.School.createSchool(school);
-        if (validationError) return validationError;
+        // Validation
+        const validationError = await this.validators.School.createSchool(school);  
+        if (validationError) return { code: 400, errors: validationError };
 
         // Creation Logic
         const createdSchool = new this.SchoolModel({
             name,
             address,
-            adminId,
-            email,
-            status: 'active',
+            schoolAdminId,
+            contactEmail,
             createdAt: new Date(),
             updatedAt: new Date(),
         });
@@ -39,27 +35,30 @@ module.exports = class School {
         await createdSchool.save();
 
         return {
-            school: createdSchool,
+            code: 201,
+            data: createdSchool,
         };
     }
 
     /**
      * Update an existing school
      * @param {Object} params
-     * @param {string} params.schoolId - ID of the school to update
+     * @param {string} params.id - ID of the school to update
      * @param {Object} params.updates - Fields to update
      * @returns {Promise<Object>} - Updated school object
      */
-    async updateSchool({ __token, __superAdmin, schoolId, updates }) {
+    async updateSchool({ __token, __superAdmin, id, name, address, schoolAdminId, contactEmail }) {
+        const school = { name, address, schoolAdminId, contactEmail };
+
         // Validation
-        const validationError = await this.validators.School.updateSchool({ schoolId, updates });
-        if (validationError) return validationError;
+        const validationError = await this.validators.School.updateSchool({id, ...school});
+        if (validationError) return { code: 400, errors: validationError };
 
         // Update Logic
         const updatedSchool = await this.SchoolModel.findByIdAndUpdate(
-            schoolId,
+            id,
             {
-                ...updates,
+                ...school,
                 updatedAt: new Date(),
             },
             { new: true }
@@ -67,56 +66,59 @@ module.exports = class School {
 
         if (!updatedSchool) {
             return {
+                code: 404,
                 error: 'School not found',
             };
         }
 
         return {
-            school: updatedSchool,
+            data: updatedSchool,
         };
     }
 
     /**
      * Delete a school by ID
      * @param {Object} params
-     * @param {string} params.schoolId - ID of the school to delete
-     * @returns {Promise<Object>} - Success message
+     * @param {string} params.id - ID of the school to delete
+     * @returns {Promise<Object>} - Response object containing status code
      */
-    async deleteSchool({ __token, __superAdmin, schoolId }) {
+    async deleteSchool({ __token, __superAdmin, id }) {
         // Validation
-        const validationError = await this.validators.School.deleteSchool({ schoolId });
-        if (validationError) return validationError;
+        const validationError = await this.validators.School.deleteSchool({ id });
+        if (validationError) return { code: 400, errors: validationError };
 
-        const deletedSchool = await this.SchoolModel.findByIdAndDelete(schoolId);
+        const deletedSchool = await this.SchoolModel.findByIdAndDelete(id);
+
         if (!deletedSchool) {
             return {
+                code: 404,
                 error: 'School not found',
             };
         }
 
         return {
-            success: true,
-            message: 'School deleted successfully',
+            code: 204
         };
     }
 
     /**
      * Fetch a single school by ID
      * @param {Object} params
-     * @param {string} params.schoolId - ID of the school to fetch
+     * @param {string} params.id - ID of the school to fetch
      * @returns {Promise<Object>} - School object
      */
-    async getSchool({ __token, __superAdmin, schoolId }) {
-        const school = await this.SchoolModel.findById(schoolId);
+    async getSchool({ __token, __superAdmin, id }) {
+        const school = await this.SchoolModel.findById(id);
 
         if (!school) {
             return {
+                code: 404,
                 error: 'School not found',
             };
         }
 
         return {
-            school,
+            data: school,
         };
     }
 
@@ -124,10 +126,10 @@ module.exports = class School {
      * Fetch all schools
      * @returns {Promise<Array>} - Array of school objects
      */
-    async getAllSchools(__token, __superAdmin) {
+    async getAllSchools(__token) {
         const schools = await this.SchoolModel.find();
         return {
-            schools,
+            data: schools,
         };
     }
 };

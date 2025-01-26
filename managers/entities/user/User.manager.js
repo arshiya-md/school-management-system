@@ -15,8 +15,8 @@ module.exports = class User {
         const user = {userName, email, password, role, schoolId};
 
         // Data validation
-        let result = await this.validators.registerUser(user);
-        if(result) return result;
+        let validationError = await this.validators.registerUser(user);
+        if (validationError) return { code: 400, errors: validationError };
 
         // Check if user already exists
         const existingUser = await this.userModel.findOne({ email });
@@ -38,13 +38,13 @@ module.exports = class User {
             role,
             schoolId
         });
+      
+        const createdUserWithoutPwd = { ...createdUser._doc };
+        delete createdUserWithoutPwd.password;
 
-        // Generate token
-        let longToken = this.tokenManager.genLongToken({userId: createdUser._id, userRole: createdUser.role, schoolId: createdUser.schoolId });
-        
         return {
-            user: createdUser, 
-            longToken 
+            code: 201, 
+            data: createdUserWithoutPwd
         };     
 
     }
@@ -71,7 +71,7 @@ module.exports = class User {
             let longToken = this.tokenManager.genLongToken({ userId: user._id, userRole: user.role, schoolId: user.schoolId });
             
             return {
-                longToken 
+                data: longToken 
             };
 
     }

@@ -8,7 +8,7 @@ module.exports = class TokenManager {
         this.config              = config;
         this.longTokenExpiresIn  = '3y';
         this.shortTokenExpiresIn = '1y';
-        this.userExposed         = ['v1_createShortToken']; // exposed functions
+        this.httpExposed         = ['v1_createShortToken'];
     }
 
     /** 
@@ -23,11 +23,12 @@ module.exports = class TokenManager {
      * long token contains immutable data and long lived
      * master key must exists on any device to create short tokens
      */
-    genLongToken({userId, userKey}){
+    genLongToken({userId, userRole, schoolId}){
         return jwt.sign(
             { 
-                userKey, 
                 userId,
+                userRole, 
+                schoolId
             }, 
             this.config.dotEnv.LONG_TOKEN_SECRET, 
             {expiresIn: this.longTokenExpiresIn
@@ -53,19 +54,17 @@ module.exports = class TokenManager {
     verifyLongToken({token}){
         return this._verifyToken({token, secret: this.config.dotEnv.LONG_TOKEN_SECRET,})
     }
-    
     verifyShortToken({token}){
         return this._verifyToken({token, secret: this.config.dotEnv.SHORT_TOKEN_SECRET,})
     }
 
-    /** generate shortId based on a longId */
-    v1_createShortToken({__headers, __device}){
-        const token = __headers.token;
-        if(!token)return {error: 'missing token '};
-        console.log('found token', token);
 
-        let decoded = this.verifyLongToken({ token });
-        if(!decoded){ return {error: 'invalid'} };
+    /** generate shortId based on a longId */
+    v1_createShortToken({__longToken, __device}){
+
+
+        let decoded = __longToken;
+        console.log(decoded);
         
         let shortToken = this.genShortToken({
             userId: decoded.userId, 

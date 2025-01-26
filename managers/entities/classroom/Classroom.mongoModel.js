@@ -5,7 +5,6 @@ const ClassroomModel = new mongoose.Schema({
     name: { type: String, required: true },
     capacity: { type: Number, required: true },
     resources: [{ type: String }],
-    status: { type: String, default: 'active' },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });

@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
 
 const SchoolModel = new mongoose.Schema({
+    schoolAdminId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     name: { type: String, required: true },
     address: { type: String, required: true },
-    adminId: { type: String, required: true },
-    email: { type: String, required: true },
-    status: { type: String, default: 'active' },
+    contactEmail: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });

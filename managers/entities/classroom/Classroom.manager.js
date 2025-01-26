@@ -10,7 +10,7 @@ module.exports = class Classroom {
 
     // Data validation
     const validationError = await this.validators.createClassroom(classroom);
-    if (validationError) return validationError;
+    if (validationError) return { code: 400, errors: validationError };
 
     // Creation Logic
     const createdClassroom = await this.ClassroomModel.create({
@@ -18,50 +18,58 @@ module.exports = class Classroom {
       name,
       capacity,
       resources,
-      status: 'active',
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
-    return { classroom: createdClassroom };
+    return {
+      code: 201,
+      data: createdClassroom
+    };
   }
 
-  async updateClassroom({ __token, __schoolAdmin, classroomId, schoolId, updates }) {
+  async updateClassroom({ __token, __schoolAdmin, classroomId, schoolId, name, capacity, resources }) {
+    const classroomInput = { name, capacity, resources };
+
     // Validation
-    const validationError = await this.validators.updateClassroom({ classroomId, updates });
-    if (validationError) return validationError;
+    const validationError = await this.validators.updateClassroom({ classroomId, schoolId, ...classroomInput });
+    if (validationError) return { code: 400, errors: validationError };
 
     // Ensure the classroom belongs to the given schoolId
     const classroom = await this.ClassroomModel.findOne({ _id: classroomId, schoolId });
     if (!classroom) {
-      return { error: 'Classroom not found or does not belong to the provided school' };
+      return { 
+        code: 404,
+        error: 'Classroom not found or does not belong to the provided school' };
     }
 
     // Update Logic
     const updatedClassroom = await this.ClassroomModel.findByIdAndUpdate(
       classroomId,
-      { ...updates, updatedAt: new Date() },
+      { ...classroomInput, updatedAt: new Date() },
       { new: true }
     );
 
-    return { classroom: updatedClassroom };
+    return { data: updatedClassroom };
   }
 
   async deleteClassroom({ __token, __schoolAdmin, classroomId, schoolId }) {
     // Validation
-    const validationError = await this.validators.deleteClassroom({ classroomId });
-    if (validationError) return validationError;
+    const validationError = await this.validators.deleteClassroom({ classroomId, schoolId });
+    if (validationError) return { code: 400, errors: validationError };
 
     // Ensure the classroom belongs to the given schoolId
     const classroom = await this.ClassroomModel.findOne({ _id: classroomId, schoolId });
     if (!classroom) {
-      return { error: 'Classroom not found or does not belong to the provided school' };
+      return { code: 404,
+        error: 'Classroom not found or does not belong to the provided school' 
+      };
     }
 
     // Delete Logic
     await this.ClassroomModel.findByIdAndDelete(classroomId);
 
-    return { success: true, message: 'Classroom deleted successfully' };
+    return { code: 204 };
   }
 
   /**
@@ -76,10 +84,13 @@ module.exports = class Classroom {
     const classroom = await this.ClassroomModel.findOne({ _id: classroomId, schoolId });
 
     if (!classroom) {
-      return { error: 'Classroom not found or does not belong to the provided school' };
+      return { 
+        code: 404,
+        error: 'Classroom not found or does not belong to the provided school' 
+      };
     }
 
-    return { classroom };
+    return { data: classroom };
   }
 
   /**
@@ -91,6 +102,6 @@ module.exports = class Classroom {
     // Fetch classrooms that belong to the given schoolId
     const classrooms = await this.ClassroomModel.find({ schoolId });
 
-    return { classrooms };
+    return { data: classrooms };
   }
 };
